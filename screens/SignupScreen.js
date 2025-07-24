@@ -1,119 +1,112 @@
 import React, { useState } from 'react';
-import {
-  View, Text, TextInput, StyleSheet, TouchableOpacity,
-  Image, Alert
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { AntDesign } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // 👈 Import this
 
-const SignupScreen = ({ navigation }) => {
+const SignupScreen = () => {
+  const navigation = useNavigation();
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
+  const [country, setCountry] = useState('');
 
   const handleSignup = async () => {
-    if (!name || !age) {
-      Alert.alert('Missing Fields', 'Please enter your name and age');
-      return;
-    }
-
-    try {
-      await AsyncStorage.setItem('userName', name);
-      await AsyncStorage.setItem('userAge', age);
-      navigation.replace('Home');
-    } catch (error) {
-      console.error('Error saving name and age:', error);
+    if (name && age && country) {
+      await AsyncStorage.setItem('userName', name); // 👈 Save the name
+      navigation.navigate('Home', { name });
+    } else {
+      alert('Please fill all fields');
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Image
-        source={require('../assets/logo.png')}
-        style={styles.logo}
-        resizeMode="contain"
-      />
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView contentContainerStyle={styles.container}>
+        <Image
+          source={{ uri: 'https://www.ux4g.gov.in/assets/img/logos-page/Emblem_of_India%202.png' }}
+          style={styles.logo}
+          resizeMode="contain"
+        />
 
-      <View style={styles.card}>
-        <Text style={styles.header}>Welcome!</Text>
-        <Text style={styles.subheader}>Sign up to get started</Text>
+        <Text style={styles.heading}>Udaan</Text>
 
         <TextInput
           style={styles.input}
-          placeholder="Your Name"
+          placeholder="Full Name"
           value={name}
           onChangeText={setName}
         />
 
         <TextInput
           style={styles.input}
-          placeholder="Your Age"
+          placeholder="Age"
+          keyboardType="numeric"
           value={age}
           onChangeText={setAge}
-          keyboardType="numeric"
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Country"
+          value={country}
+          onChangeText={setCountry}
         />
 
         <TouchableOpacity style={styles.button} onPress={handleSignup}>
-          <Text style={styles.buttonText}>Continue</Text>
+          <AntDesign name="arrowright" size={20} color="white" />
+          <Text style={styles.buttonText}>  Continue</Text>
         </TouchableOpacity>
-      </View>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
-export default SignupScreen;
-
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f2f2f2',
+    padding: 24,
+    backgroundColor: '#f8f9fa',
+    flexGrow: 1,
     justifyContent: 'center',
   },
   logo: {
-    width: 120,
-    height: 80,
+    width: 90,
+    height: 90,
     alignSelf: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
   },
-  card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 6,
-    elevation: 4,
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: '700',
-    marginBottom: 6,
-    textAlign: 'center',
-  },
-  subheader: {
-    fontSize: 14,
-    color: '#666',
+  heading: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#333',
     marginBottom: 20,
     textAlign: 'center',
   },
   input: {
-    backgroundColor: '#f8f8f8',
-    padding: 14,
+    backgroundColor: 'white',
+    padding: 12,
     borderRadius: 12,
     marginBottom: 16,
-    fontSize: 16,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#ced4da',
   },
   button: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#0069d9',
     padding: 14,
     borderRadius: 12,
+    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
+    elevation: 2,
+    marginTop: 10,
   },
   buttonText: {
-    color: '#ffffff',
-    fontWeight: '600',
+    color: 'white',
     fontSize: 16,
+    fontWeight: '600',
   },
 });
+
+export default SignupScreen;
